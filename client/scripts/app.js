@@ -17,7 +17,20 @@ $(document).ready(function() {
   data: JSON.stringify(somecontent),
   contentType: 'application/json',
   success: function (data) {
-    console.log('chatterbox: Message sent');
+    console.log(data);
+  },
+  error: function (data) {
+    // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
+    console.error('chatterbox: Failed to send message');
+  }});
+
+	$.ajax({
+  url: 'https://api.parse.com/1/classes/chatterbox',
+  type: 'DELETE',
+  data: JSON.stringify(somecontent),
+  contentType: 'application/json',
+  success: function (data) {
+    console.log(data);
   },
   error: function (data) {
     // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
@@ -30,7 +43,7 @@ $(document).ready(function() {
   data: JSON.stringify(somecontent),
   contentType: 'application/json',
   success: function (data) {
-    console.log('chatterbox: Message received');
+    console.log(data.results[0]);
   },
   error: function (data) {
     // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
@@ -41,12 +54,14 @@ $(document).ready(function() {
 //get into this returned object;
 	//we want the inner object inside responseJSON
 	//log that
-  console.log(chatstatus);
+  // for (key in Object.keys(chatstatus)) {
+  // 	console.log(key, chatstatus[key]);
+  // }
 });
 
 //let's try to 
 var username = "Max";
-var somecontent = {message: "Hey there",
-				username: "Max",
+var somecontent = {username: "Max",
+                text: "Hey there",
 				roomname: "4chan"};
 
