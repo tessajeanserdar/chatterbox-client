@@ -1,6 +1,9 @@
 // YOUR CODE HERE:
 //display messages retrieved from parse server
 
+window.rooms = {};
+window.friends = {};
+
 var app = {};
 
 app.server = 'https://api.parse.com/1/classes/chatterbox';
@@ -49,9 +52,17 @@ app.fetch = function() {
      if( chatName && chatBody) {
         if ((chatBody.indexOf('src') ===-1 && chatName.indexOf('src') ===-1) 
           && chatBody.indexOf('script') ===-1 && chatName.indexOf('script') ===-1){
-          $chat.text(chatName + " : " + chatBody);
-        // var safeChat = ESAPI.encoder().encodeForHTML($chat);
-      // append that do the #chat id
+          var chatRoom = item.roomname;
+          window.rooms[chatRoom] = true;
+
+          var $username = $('<div></div>');
+          $username.addClass("username");
+          var $message = $('<div></div>')
+          $username.text(chatName);
+          $message.text(": " + chatBody);
+          var $chat = $('<div></div>');
+          $chat.append($username);
+          $chat.append($message);
           $('#chats').append($chat);
        //console.log(data);
         }
@@ -59,6 +70,23 @@ app.fetch = function() {
 
 
    });
+    $('.username').on('click', function() {
+    event.stopPropagation();
+    var thisUser = $(this).text();
+    app.addFriend(thisUser);
+    // console.log($(this).text());
+    //app.addFriend("Jane Doe");
+   });
+
+    var $roomList = $('<div></div>');
+    $roomList.attr("id",'roomSelect');
+    for (key in window.rooms) {
+    var $room = $('<div></div>');
+    $room.text(key);
+    $roomList.append($room);
+    };
+
+   $('body').append($roomList);
 },
   error: function (data) {
     // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
@@ -70,30 +98,49 @@ app.fetch = function() {
 
 
   app.clearMessages = function() {
-      // $.ajax({
-     //  url: 'https://api.parse.com/1/classes/chatterbox',
-     //  type: 'DELETE',
-     //  data: JSON.stringify(somecontent),
-     //  contentType: 'application/json',
-     //  success: function (data) {
-     //    console.log(data);
-     //  },
-     //  error: function (data) {
-     //    // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
-     //    console.error('chatterbox: Failed to send message');
-     //  }})
-
+    var childArr = $('#chats').children();
+    for (var i = 0; i < childArr.length; i++) {
+      console.log(childArr[i]);
+      childArr[i].remove();
+    };
   };
 
-  app.addMessage = function() {
-
-
+  app.addMessage = function(message) {
+    var $username = $('<div></div>');
+    $username.addClass("username");
+    var $message = $('<div></div>')
+    $username.text(message.username);
+    $message.text(message.message);
+    var $chat = $('<div></div>');
+    $chat.append($username);
+    $chat.append($message);
+    $('#chats').append($chat);
   };
+
+app.addRoom = function(room) {
+  if (window.rooms[room] === undefined) {
+    window.rooms[room] = true;
+    var $room = $('<div></div>');
+    $room.text(room);
+    $('#roomSelect').append($room);
+  }
+};
+
+app.addFriend = function(friend) {
+  if (window.friends[friend] === undefined) {
+    window.friends[friend] = true;
+  }
+};
 
 
 
 //hold off on retrieving for a second
 $(document).ready(function() {
+
+   app.fetch();
+
+
+
 
    // get all the chats
    var $refreshButton = $('<button></button>');
@@ -102,9 +149,21 @@ $(document).ready(function() {
    $('#main').append($refreshButton);
 
    $('.refresh').on('click', function() {
+    app.clearMessages();
+    $('#roomSelect').remove();
     app.fetch();
    });
+   // clear chats
+    var $clearButton = $('<button></button>');
+   $clearButton.addClass("clear");
+   $clearButton.text("Clear Chats");
+   $('#main').append($clearButton);
 
+   $('.clear').on('click', function() {
+    app.clearMessages();
+   });
+
+  // get login information
   var login = document.getElementById('login');
   var userName = document.getElementById('username');
 
@@ -112,7 +171,7 @@ $(document).ready(function() {
     $('#login').text("Welcome, " + userName.value);
    });
 
-
+   // get chat body
    var form = document.getElementById('form');
    var userMessage = document.getElementById('message');
 
@@ -122,29 +181,8 @@ $(document).ready(function() {
     toSend.text = messageContents;
     toSend.username = userName.value;
     app.send(toSend);
-   });
+   }); 
 
-
-  app.fetch();
-   // var chats = chats.results;
-   // chats.forEach(function(item){
-   // // get the text of the chat
-   // // wrap it in some sort of div or span
-   // $chat = $('<div></div>');
-   // $chat.text(item.username + " " + item.text);
-   // // append that do the #chat id
-   // $('#chats').append($chat);
-
-   // })
-   
-  
-
-//get into this returned object;
-	//we want the inner object inside responseJSON
-	//log that
-  // for (key in Object.keys(chatstatus)) {
-  // 	console.log(key, chatstatus[key]);
-  // }
 });
 
 //let's try to 
