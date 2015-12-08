@@ -118,6 +118,7 @@ app.fetch = function() {
   };
 
 app.addRoom = function(room) {
+  console.log(window.rooms[room]);
   if (window.rooms[room] === undefined) {
     window.rooms[room] = true;
     var $room = $('<div></div>');
@@ -130,6 +131,16 @@ app.addFriend = function(friend) {
   if (window.friends[friend] === undefined) {
     window.friends[friend] = true;
   }
+};
+
+app.handleSubmit = function() {
+    var form = document.getElementById('form');
+    var userMessage = document.getElementById('message');
+    var messageContents = userMessage.value;
+    var toSend = {};
+    toSend.text = messageContents;
+    toSend.username = userName.value;
+    app.send(toSend);
 };
 
 
@@ -172,15 +183,17 @@ $(document).ready(function() {
    });
 
    // get chat body
-   var form = document.getElementById('form');
-   var userMessage = document.getElementById('message');
+
 
    $('#submit').on('click', function() {
-    var messageContents = userMessage.value;
-    var toSend = {};
-    toSend.text = messageContents;
-    toSend.username = userName.value;
-    app.send(toSend);
+    app.handleSubmit();
+   }); 
+
+    var roomform = document.getElementById('roomform');
+    var roomname = document.getElementById('newroom');
+
+   $('#submitroom').on('click', function() {
+    app.addRoom(roomname.value);
    }); 
 
 });
