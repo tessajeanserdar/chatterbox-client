@@ -46,7 +46,8 @@ app.fetch = function() {
    // get the text of the chat
    // wrap it in some sort of div or span
      $chat = $('<div></div>');
-     $chat.addClass("chat");
+     // var chatClass = "chat";
+     // $chat.addClass("chat");
      var chatName = item.username;
      var chatBody = item.text;
      if( chatName && chatBody) {
@@ -55,12 +56,36 @@ app.fetch = function() {
           var chatRoom = item.roomname;
           window.rooms[chatRoom] = true;
 
+          var noSpace = "";
+
+          if (chatRoom !== undefined) {
+          for (var k = 0; k < chatRoom.length; k++) {
+            if (chatRoom.slice(k, k+1) !== " " && chatRoom.slice(k, k+1) !== "!") {
+              noSpace = noSpace + chatRoom.slice(k, k+1);
+            }
+          };
+          }
+
+          var noSpaceName = "";
+
+          if (chatName !== undefined) {
+          for (var k = 0; k < chatName.length; k++) {
+            if (chatName.slice(k, k+1) !== " " && chatName.slice(k, k+1) !== "!") {
+              noSpaceName = noSpaceName + chatName.slice(k, k+1);
+            }
+          };
+          }
+
+
+
           var $username = $('<div></div>');
+          //fix spaces on chatName to make a class
           $username.addClass("username");
           var $message = $('<div></div>')
           $username.text(chatName);
           $message.text(": " + chatBody);
           var $chat = $('<div></div>');
+          $chat.addClass(noSpace).addClass("chat").addClass(noSpaceName);
           $chat.append($username);
           $chat.append($message);
           $('#chats').append($chat);
@@ -76,7 +101,19 @@ app.fetch = function() {
     app.addFriend(thisUser);
     // console.log($(this).text());
     //app.addFriend("Jane Doe");
+     var cleanName = "";
+
+          if (thisUser !== undefined) {
+          for (var k = 0; k < thisUser.length; k++) {
+            if (thisUser.slice(k, k+1) !== " " && thisUser.slice(k, k+1) !== "!") {
+              cleanName = cleanName + thisUser.slice(k, k+1);
+            }
+          };
+          }
+      var myFriend = "." + cleanName;
+  $(myFriend).addClass("isFriend");
    });
+
 
     var $roomList = $('<div></div>');
     $roomList.attr("id",'roomSelect');
@@ -86,7 +123,23 @@ app.fetch = function() {
     $roomList.append($room);
     };
 
+
+
    $('body').append($roomList);
+
+      $('#roomSelect').children().on('click', function() {
+        $('.chat').removeClass("hidden");
+        var currentRoom = '.' + $(this).text();
+        var currentClean = "";
+          for (var k = 0; k < currentRoom.length; k++) {
+            if (currentRoom.slice(k, k+1) !== " " && currentRoom.slice(k, k+1) !== "!") {
+              currentClean = currentClean + currentRoom.slice(k, k+1);
+            }
+          };
+        $('.chat').not(currentClean).addClass("hidden");
+        // $(currentRoom).removeClass("hidden");
+
+    });
 },
   error: function (data) {
     // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
